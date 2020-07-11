@@ -9,12 +9,9 @@ router.get('/:id', auth, stuffCtrl.getOneSauce) // display a sauce
 router.post('/', auth, multer, stuffCtrl.createSauce) // create a new sauce
 router.put('/:id', auth, multer, stuffCtrl.modifySauce) // change a sauce
 router.delete('/:id', auth, stuffCtrl.deleteSauce) // delete a sauce
-
+router.post('/:id/like', auth, stuffCtrl.reactionSauce) // like or dislike a sauce
 
 module.exports = router
-
-
-
 
 // const express = require('express');
 // const router = express.Router();
