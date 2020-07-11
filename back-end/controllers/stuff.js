@@ -81,8 +81,8 @@ exports.reactionSauce = (req, res) => {
     } else {
         Sauce.findOne({ _id: req.params.id })
             .then((sauce) => {
-                const userDisliked = sauce.usersDisliked.includes(userId)
-                if (userDisliked == true) {
+                const userDislikedDelete = sauce.usersDisliked.includes(userId)
+                if (userDislikedDelete == true) {
                     Sauce.updateOne({ _id: req.params.id }, {
                             $pull: { usersDisliked: userId },
                             $inc: { dislikes: -1 }
