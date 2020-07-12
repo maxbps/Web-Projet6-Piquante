@@ -1,6 +1,10 @@
 const Sauce = require('../models/sauce')
 const fs = require('fs')
 
+//https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/RegExp/test
+//https://openclassrooms.com/fr/courses/146276-tout-sur-le-javascript/145569-lobjet-regexp
+//exemple du regex "pseudo" du cours openclassrooms à la difference que les espaces sont autorisés
+const regex = /^[a-zA-Z0-9 -]{3,16}$/
 
 exports.getAllSauces = (req, res, next) => {
     Sauce.find()
@@ -16,18 +20,22 @@ exports.getOneSauce = (req, res, next) => {
 
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce)
-    delete sauceObject._id
-    sauceObject.likes = 0
-    sauceObject.dislikes = 0
-    sauceObject.usersLiked = []
-    sauceObject.usersDisliked = []
-    const sauce = new Sauce({
-        ...sauceObject,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    })
-    sauce.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-        .catch(error => res.status(400).json({ error }))
+    if (!regex.test(sauceObject.name, sauceObject.manufacturer, sauceObject.description, sauceObject.mainPepper)) {
+        res.status(401).json("ne doit contenir que des chiffres des lettres et des espaces")
+    } else {
+        delete sauceObject._id
+        sauceObject.likes = 0
+        sauceObject.dislikes = 0
+        sauceObject.usersLiked = []
+        sauceObject.usersDisliked = []
+        const sauce = new Sauce({
+            ...sauceObject,
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        })
+        sauce.save()
+            .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+            .catch(error => res.status(400).json({ error }))
+    }
 }
 
 
@@ -36,9 +44,13 @@ exports.modifySauce = (req, res, next) => {
         ...JSON.parse(req.body.sauce),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : {...req.body }
-    Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Objet modifiée !' }))
-        .catch(error => res.status(400).json({ error }))
+    if (!regex.test(sauceObject.name, sauceObject.manufacturer, sauceObject.description, sauceObject.mainPepper)) {
+        res.status(401).json("ne doit contenir que des chiffres des lettres et des espaces")
+    } else {
+        Sauce.updateOne({ _id: req.params.id }, {...sauceObject, _id: req.params.id })
+            .then(() => res.status(200).json({ message: 'Objet modifiée !' }))
+            .catch(error => res.status(400).json({ error }))
+    }
 }
 
 exports.deleteSauce = (req, res, next) => {
@@ -59,8 +71,8 @@ exports.deleteSauce = (req, res, next) => {
 exports.reactionSauce = (req, res) => {
     const sauceLiked = req.file ? {
         ...JSON.parse(req.body.sauce),
-    } : {...req.body };
-    const like = sauceLiked.like;
+    } : {...req.body }
+    const like = sauceLiked.like
     const userId = sauceLiked.userId
     if (like == 1) {
         Sauce.updateOne({ _id: req.params.id }, {
@@ -99,7 +111,7 @@ exports.reactionSauce = (req, res) => {
                 }
             })
     }
-};
+}
 
 
 // const Thing = require('../models/things');

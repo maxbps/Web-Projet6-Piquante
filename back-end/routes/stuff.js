@@ -13,6 +13,8 @@ router.post('/:id/like', auth, stuffCtrl.reactionSauce) // like or dislike a sau
 
 module.exports = router
 
+
+
 // const express = require('express');
 // const router = express.Router();
 // const auth = require('../middleware/auth')
