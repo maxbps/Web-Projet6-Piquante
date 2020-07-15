@@ -1,3 +1,5 @@
+//https: //www.geeketfier.fr/archives/mots-de-passe-hashage-et-salage-suffisant/
+
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
